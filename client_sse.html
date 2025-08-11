@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SSE Client</title>
+</head>
+<body>
+  <h1>Check your console for SSE ticks</h1>
+  <script>
+    console.log("BOOT");
+    const es = new EventSource("http://127.0.0.1:8000/stream");
+    console.log("readyState@start", es.readyState); // 0=CONNECTING, 1=OPEN, 2=CLOSED
+    es.onopen    = () => console.log("OPEN", es.readyState);
+    es.onmessage = e  => console.log("MSG", e.data);
+    es.onerror   = e  => console.log("ERROR", es.readyState, e);
+    es.addEventListener("end", () => {
+      console.log("Stream ended");
+      es.close();
+    });
+  </script>
+</body>
+</html>
