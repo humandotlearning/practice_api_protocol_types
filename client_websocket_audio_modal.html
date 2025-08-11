@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html><body>
+  <h1>WebSocket demo (same origin)</h1>
+
+<script>
+    let ws, rec, stream;
+    async function start() {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      ws = new WebSocket("wss://humandotlearning--stt-ws.modal.run/stt");
+      ws.onmessage = e => {
+        const m = JSON.parse(e.data);
+        console.log("TRANSCRIPT:", m);
+        if (m.type === "final") {
+          ws.close(1000, "done");             // close after final ✅
+          // release mic when we're truly done
+          stream.getTracks().forEach(t => t.stop());  // ✅ mic icon disappears
+        }
+      };
+    
+      const mr = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
+      mr.ondataavailable = e => e.data.arrayBuffer().then(buf => ws.readyState===1 && ws.send(buf));
+      mr.start(200); // ms chunk size
+      rec = mr;
+    }
+    function stop() { 
+        // flush last chunk and then signal EOS without closing WS
+        rec.requestData();
+        rec.addEventListener('dataavailable', () => {
+            if (ws?.readyState === 1) ws.send(new Uint8Array(0));   // EOS ✅
+        }, { once: true });
+        rec.stop();
+        stream.getTracks().forEach(t => t.stop());
+     }
+    </script>
+    <button onclick="start()">Start</button>
+    <button onclick="stop()">Stop</button>
+    
+</body></html>

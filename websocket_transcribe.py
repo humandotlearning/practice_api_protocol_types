@@ -62,5 +62,9 @@ async def stt(ws: WebSocket):
         stop.set()
         
         await asyncio.gather(recv_task, return_exceptions=True)
-        
-    
+        # Gracefully close the WebSocket to avoid reserved status close codes
+        if ws.application_state == WebSocketState.CONNECTED:
+            try:
+                await ws.close(code=1000)
+            except Exception:
+                pass
