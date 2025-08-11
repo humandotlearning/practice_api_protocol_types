@@ -46,3 +46,17 @@ uv run -m http.server 5500
 # goto and check console to see WebSocket running: 
 # http://localhost:5500/client_websocket.html
 ```
+
+
+#### websocket audio
+
+```
+uv run uvicorn websocket_transcribe:app --reload
+
+
+# in different terminal
+uv run -m http.server 5500
+
+# goto and check console to see WebSocket running: 
+# http://localhost:5500/client_websocket_audio.html
+```
