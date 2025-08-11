@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html><body>
+  <h1>WebSocket demo (same origin)</h1>
+  <script>
+    const s = new WebSocket('ws://localhost:8000/ws');
+    s.onmessage = e => console.log(e.data);
+    s.onopen = _ => s.send('hello');
+  </script>
+</body></html>
